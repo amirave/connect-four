@@ -17,7 +17,7 @@ public class Game
         bot = new Minmax(searchDepth);
     }
 
-    public void DropPiece(int c)
+    public void PlayerTurn(int c)
     {
         Set(c, SlotType.Player);
 
@@ -29,6 +29,14 @@ public class Game
             return;
         }
 
+        if (board.IsFull())
+        {
+            display.Win(null, SlotType.Empty);
+        }
+    }
+
+    public void BotTurn()
+    {
         int botC = bot.MakeMove(board);
         Set(botC, SlotType.Bot);
 
@@ -38,6 +46,11 @@ public class Game
         {
             display.Win(BotWinData, SlotType.Bot);
             return;
+        }
+
+        if (board.IsFull())
+        {
+            display.Win(null, SlotType.Empty);
         }
     }
 

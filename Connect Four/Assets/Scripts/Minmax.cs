@@ -28,7 +28,7 @@ public class Minmax
 
         if (botTurn)
         {
-            int value = int.MinValue + 1;
+            int value = int.MinValue + 10;
             int bestC = -1;
 
             for (int c = 0; c < state.GetWidth(); c++)
@@ -62,7 +62,7 @@ public class Minmax
         }
         else
         {
-            int value = int.MaxValue;
+            int value = int.MaxValue - 10;
             int worstC = -1;
 
             for (int c = 0; c < state.GetWidth(); c++)

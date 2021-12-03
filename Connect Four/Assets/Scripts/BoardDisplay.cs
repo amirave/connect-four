@@ -19,6 +19,8 @@ public class BoardDisplay : MonoBehaviour
     private Game gameBoard;
 
     private bool gameEnded = false;
+    private bool playerTurn = true;
+    private bool canPlace = true;
     private int moves = 0;
 
     void Start()
@@ -31,21 +33,34 @@ public class BoardDisplay : MonoBehaviour
         int c = ClosestColumn();
         int r = gameBoard.GetBoard().FirstEmpty(c);
 
-        hoverPiece.SetActive(!gameEnded);
+        hoverPiece.SetActive(!gameEnded && playerTurn);
         if (r != -1)
         {
             Vector3 hoverTarget = BoardToWorldPosition(c, r);
             hoverPiece.transform.position = Vector3.Lerp(hoverPiece.transform.position, hoverTarget, 1 * Time.deltaTime * 30);
         }
 
-        if (Input.GetMouseButtonDown(0) && !gameEnded)
+        if (playerTurn)
         {
-            if (gameBoard.GetBoard().ValidMove(c))
+            if (Input.GetMouseButtonDown(0) && !gameEnded)
             {
-                gameBoard.DropPiece(c);
-                moves++;
+                if (gameBoard.GetBoard().ValidMove(c))
+                {
+                    gameBoard.PlayerTurn(c);
+                    moves++;
+                }
+
+                playerTurn = false;
+                canPlace = false;
             }
         }
+        else
+        {
+            gameBoard.BotTurn();
+            playerTurn = true;
+            canPlace = true;
+        }
+        
     }
 
     int ClosestColumn()
@@ -105,6 +120,14 @@ public class BoardDisplay : MonoBehaviour
     IEnumerator WinAnim(int[] points, SlotType winner)
     {
         gameEnded = true;
+
+        if (winner == SlotType.Empty)
+        {
+            Transform t = winScreen.transform;
+
+            t.GetChild(0).GetComponent<TMP_Text>().text = "Draw!";
+            t.GetChild(1).GetComponent<TMP_Text>().text = "the board is completely full and yet nobody won.";
+        }
 
         Vector3 start = BoardToWorldPosition(points[0] - 0.1f, points[1] - 0.1f);
         Vector3 end = BoardToWorldPosition(points[2] - 0.1f, points[3] - 0.1f);
