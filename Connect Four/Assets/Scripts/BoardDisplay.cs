@@ -128,20 +128,22 @@ public class BoardDisplay : MonoBehaviour
             t.GetChild(0).GetComponent<TMP_Text>().text = "Draw!";
             t.GetChild(1).GetComponent<TMP_Text>().text = "the board is completely full and yet nobody won.";
         }
+        else
+        {
+            Vector3 start = BoardToWorldPosition(points[0] - 0.1f, points[1] - 0.1f);
+            Vector3 end = BoardToWorldPosition(points[2] - 0.1f, points[3] - 0.1f);
+            end += (Camera.main.transform.position - end) / 3;
+            start += (Camera.main.transform.position - start) / 3;
 
-        Vector3 start = BoardToWorldPosition(points[0] - 0.1f, points[1] - 0.1f);
-        Vector3 end = BoardToWorldPosition(points[2] - 0.1f, points[3] - 0.1f);
-        end += (Camera.main.transform.position - end) / 3;
-        start += (Camera.main.transform.position - start) / 3;
+            yield return new WaitForSeconds(1);
 
-        yield return new WaitForSeconds(1);
+            yield return StartCoroutine(LineAnim(start, end));
 
-        yield return StartCoroutine(LineAnim(start, end));
+            yield return new WaitForSeconds(1.5f);
 
-        yield return new WaitForSeconds(1.5f);
-
-        winScreen.SetActive(true);
-        SetWinData(winner == SlotType.Player, moves);
+            winScreen.SetActive(true);
+            SetWinData(winner == SlotType.Player, moves);
+        }
     }
 
     void SetWinData(bool playerWon, int moves)

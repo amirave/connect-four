@@ -28,7 +28,7 @@ public class Minmax
 
         if (botTurn)
         {
-            int value = int.MinValue + 10;
+            int value = int.MinValue;
             int bestC = -1;
 
             for (int c = 0; c < state.GetWidth(); c++)
@@ -43,7 +43,7 @@ public class Minmax
                 int nextScore;
 
                 if (next.IsWinPos(c, r, SlotType.Bot))
-                    nextScore = int.MaxValue;
+                    nextScore = 100000;
                 else
                     nextScore = Minimax(next, depth - 1, a, b, !botTurn).GetSecond();
 
@@ -62,7 +62,7 @@ public class Minmax
         }
         else
         {
-            int value = int.MaxValue - 10;
+            int value = int.MaxValue;
             int worstC = -1;
 
             for (int c = 0; c < state.GetWidth(); c++)
@@ -77,7 +77,7 @@ public class Minmax
                 int nextScore;
 
                 if (next.IsWinPos(c, r, SlotType.Player))
-                    nextScore = int.MinValue;
+                    nextScore = -100000;
                 else
                     nextScore = Minimax(next, depth - 1, a, b, !botTurn).GetSecond();
 
