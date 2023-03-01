@@ -19,6 +19,11 @@ public static class AI
 
         if (depth == 0)
             return new Pair<int, int>(-1, EvaluateBoard(state, type));
+        
+        if (state.WinningMove() == type)
+            return new Pair<int, int>(-1, 1000000);
+        if (state.WinningMove() == otherType)
+            return new Pair<int, int>(-1, -1000000);
 
         // If its the AI's turn, try to maximize score, if its the other player's turn, try to minimize score
         if (myTurn)
@@ -35,12 +40,7 @@ public static class AI
                 // Clone the board to not affect the old one
                 Board next = new Board(state);
                 int r = next.Set(c, type);
-                int nextScore;
-
-                if (next.IsWinPos(c, r, type))
-                    nextScore = 100000;
-                else
-                    nextScore = Minimax(next, type, depth - 1, alpha, beta, false).GetSecond();
+                int nextScore = Minimax(next, type, depth - 1, alpha, beta, false).GetSecond();
 
                 if (nextScore > bestValue)
                 {
@@ -69,12 +69,7 @@ public static class AI
                 // Clone the board to not affect the old one
                 Board next = new Board(state);
                 int r = next.Set(c, otherType);
-                int nextScore;
-
-                if (next.IsWinPos(c, r, otherType))
-                    nextScore = -100000;
-                else 
-                    nextScore = Minimax(next, type, depth - 1, alpha, beta, true).GetSecond();
+                int nextScore = Minimax(next, type, depth - 1, alpha, beta, true).GetSecond();
 
                 if (nextScore < worseValue)
                 {
@@ -157,16 +152,16 @@ public static class AI
         if (CountLine(line, type) == 4)
             score += 100;
         else if (CountLine(line, type) == 3 && CountLine(line, SlotType.Empty) == 1)
-            score += 5;
+            score += 20;
         else if (CountLine(line, type) == 2 && CountLine(line, SlotType.Empty) == 2)
             score += 2;
 
         if (CountLine(line, otherType) == 4)
             score -= 100;
         else if (CountLine(line, otherType) == 3 && CountLine(line, SlotType.Empty) == 1)
-            score += 5;
+            score -= 20;
         else if (CountLine(line, otherType) == 2 && CountLine(line, SlotType.Empty) == 2)
-            score += 2;
+            score -= 2;
 
         return score;
     }

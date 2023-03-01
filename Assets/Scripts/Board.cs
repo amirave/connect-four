@@ -73,9 +73,8 @@ public class Board
     public bool IsFull()
     {
         for (int i = 0; i < GetWidth(); i++)
-            for (int j = 0; j < GetHeight(); j++)
-                if (Get(i, j) == SlotType.Empty)
-                    return false;
+            if (ValidMove(i))
+                return false;
 
         return true;
     }
