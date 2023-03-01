@@ -35,8 +35,12 @@ public static class AI
                 // Clone the board to not affect the old one
                 Board next = new Board(state);
                 int r = next.Set(c, type);
+                int nextScore;
 
-                var nextScore = Minimax(next, type, depth - 1, alpha, beta, false).GetSecond();
+                if (next.IsWinPos(c, r, type))
+                    nextScore = 100000;
+                else
+                    nextScore = Minimax(next, type, depth - 1, alpha, beta, false).GetSecond();
 
                 if (nextScore > bestValue)
                 {
@@ -45,8 +49,8 @@ public static class AI
                 }
 
                 alpha = Mathf.Max(alpha, bestValue);
-                // if (alpha >= beta)
-                //     break;
+                if (alpha >= beta)
+                    break;
             }
 
             return new Pair<int, int>(bestC, bestValue);
@@ -65,8 +69,12 @@ public static class AI
                 // Clone the board to not affect the old one
                 Board next = new Board(state);
                 int r = next.Set(c, otherType);
+                int nextScore;
 
-                var nextScore = Minimax(next, type, depth - 1, alpha, beta, true).GetSecond();
+                if (next.IsWinPos(c, r, otherType))
+                    nextScore = -100000;
+                else 
+                    nextScore = Minimax(next, type, depth - 1, alpha, beta, true).GetSecond();
 
                 if (nextScore < worseValue)
                 {
@@ -75,8 +83,8 @@ public static class AI
                 }
 
                 beta = Mathf.Min(beta, worseValue);
-                // if (alpha >= beta)
-                //     break;
+                if (alpha >= beta)
+                    break;
             }
 
             return new Pair<int, int>(worstC, worseValue);
@@ -85,46 +93,35 @@ public static class AI
 
     // Give the whole board a score based on how close to winning a certain player is
     // Called when the minimax algorithm reaches its max depth
-    private static int EvaluateBoard(Board board, SlotType type)
+    private static int EvaluateBoard(Board board, SlotType piece)
     {
         int score = 0;
 
-        // Score center row
-        SlotType[] centerArray = new SlotType[board.GetWidth()];
-        for (int c = 0; c < board.GetWidth(); c++)
+        // Score center column
+        int centerCount = 0;
+        for (int r = 0; r < board.GetHeight(); r++)
         {
-            centerArray[c] = board.Get(c, board.GetHeight() / 2);
+            centerCount += board.Get(board.GetWidth() / 2, r) == piece ? 1 : 0;
         }
-        int centerCount = centerArray.Count(p => p == type);
         score += centerCount * 3;
-
-        // Score Vertical
-        for (int c = 0; c < board.GetWidth(); c++)
-        {
-            SlotType[] colArray = new SlotType[board.GetHeight()];
-            for (int r = 0; r < board.GetHeight(); r++)
-            {
-                colArray[r] = board.Get(c, r);
-            }
-            for (int r = 0; r < board.GetHeight() - 3; r++)
-            {
-                SlotType[] window = new SlotType[] { colArray[r], colArray[r + 1], colArray[r + 2], colArray[r + 3] };
-                score += EvaluateWindow(window, type);
-            }
-        }
 
         // Score Horizontal
         for (int r = 0; r < board.GetHeight(); r++)
         {
-            SlotType[] rowArray = new SlotType[board.GetWidth()];
-            for (int c = 0; c < board.GetWidth(); c++)
-            {
-                rowArray[c] = board.Get(c, r);
-            }
             for (int c = 0; c < board.GetWidth() - 3; c++)
             {
-                SlotType[] window = new SlotType[] { rowArray[c], rowArray[c + 1], rowArray[c + 2], rowArray[c + 3] };
-                score += EvaluateWindow(window, type);
+                SlotType[] window = {board.Get(c, r), board.Get(c + 1, r), board.Get(c + 2, r), board.Get(c + 3, r)};
+                score += EvaluateWindow(window, piece);
+            }
+        }
+
+        // Score Vertical
+        for (int c = 0; c < board.GetWidth(); c++)
+        {
+            for (int r = 0; r < board.GetHeight() - 3; r++)
+            {
+                SlotType[] window = {board.Get(c, r), board.Get(c, r + 1), board.Get(c, r + 2), board.Get(c, r + 3)};
+                score += EvaluateWindow(window, piece);
             }
         }
 
@@ -133,8 +130,8 @@ public static class AI
         {
             for (int c = 0; c < board.GetWidth() - 3; c++)
             {
-                SlotType[] window = new SlotType[] { board.Get(c, r), board.Get(c + 1, r + 1), board.Get(c + 2, r + 2), board.Get(c + 3, r + 3) };
-                score += EvaluateWindow(window, type);
+                SlotType[] window = { board.Get(c, r), board.Get(c + 1, r + 1), board.Get(c + 2, r + 2), board.Get(c + 3, r + 3) };
+                score += EvaluateWindow(window, piece);
             }
         }
 
@@ -142,8 +139,8 @@ public static class AI
         {
             for (int c = 0; c < board.GetWidth() - 3; c++)
             {
-                SlotType[] window = new SlotType[] { board.Get(c, r + 3), board.Get(c + 1, r + 2), board.Get(c + 2, r + 1), board.Get(c + 3, r) };
-                score += EvaluateWindow(window, type);
+                SlotType[] window = { board.Get(c, r + 3), board.Get(c + 1, r + 2), board.Get(c + 2, r + 1), board.Get(c + 3, r) };
+                score += EvaluateWindow(window, piece);
             }
         }
 
@@ -159,15 +156,17 @@ public static class AI
 
         if (CountLine(line, type) == 4)
             score += 100;
-
         else if (CountLine(line, type) == 3 && CountLine(line, SlotType.Empty) == 1)
             score += 5;
-
         else if (CountLine(line, type) == 2 && CountLine(line, SlotType.Empty) == 2)
             score += 2;
 
-        if (CountLine(line, otherType) == 3 && CountLine(line, SlotType.Empty) == 1)
-            score -= 4;
+        if (CountLine(line, otherType) == 4)
+            score -= 100;
+        else if (CountLine(line, otherType) == 3 && CountLine(line, SlotType.Empty) == 1)
+            score += 5;
+        else if (CountLine(line, otherType) == 2 && CountLine(line, SlotType.Empty) == 2)
+            score += 2;
 
         return score;
     }

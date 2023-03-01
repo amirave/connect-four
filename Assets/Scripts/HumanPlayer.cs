@@ -50,7 +50,6 @@ public class HumanPlayer : Player
         // Update hover piece to follow the user's cursor
         if (r != -1)
         {
-            Debug.Log(game.GetBoard().IsWinPos(c, r, slotType));
             Vector3 hoverTarget = display.BoardToWorldPosition(c, r);
             hoverPiece.position = Vector3.Lerp(hoverPiece.position, hoverTarget, 1 * Time.deltaTime * 30);
         }

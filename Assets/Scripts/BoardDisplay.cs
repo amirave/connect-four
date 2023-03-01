@@ -48,85 +48,8 @@ public class BoardDisplay : MonoBehaviour
             suggestUI.SetActive(game.curPlayer.canSuggest);
             game.curPlayer.Update();
         }
-
-        if (Input.GetKeyDown(KeyCode.R))
-            StartCoroutine(Test());
     }
-
-    private void OnDrawGizmos()
-    {
-        var b = game.GetBoard();
-        for (int c = 0; c < b.GetWidth(); c++)
-        {
-            for (int r = 0; r < b.GetHeight(); r++)
-            {
-                Gizmos.color = b.IsWinPos(c, r, game.curPlayer.slotType) ? Color.green : Color.gray;
-                Gizmos.DrawSphere(BoardToWorldPosition(c, r), 0.2f);
-            }
-        }
-    }
-
-    IEnumerator Test()
-    {
-        var b = game.GetBoard();
-        
-        // horizontal
-        for (int r = 0; r < b.GetHeight(); r++)
-        {
-            for (int c = 0; c < b.GetWidth() - 3; c++)
-            {
-                Vector3 start = BoardToWorldPosition(c, r);
-                Vector3 end = BoardToWorldPosition(c+3, r);
-                end += (Camera.main.transform.position - end) / 3;
-                start += (Camera.main.transform.position - start) / 3;
-                line.SetPositions(new Vector3[] { start, end });
-                yield return new WaitForSeconds(0.2f);
-            }
-        }
-
-        // vertical
-        for (int r = 0; r < b.GetHeight() - 3; r++)
-        {
-            for (int c = 0; c < b.GetWidth(); c++)
-            {
-                Vector3 start = BoardToWorldPosition(c, r);
-                Vector3 end = BoardToWorldPosition(c, r+3);
-                end += (Camera.main.transform.position - end) / 3;
-                start += (Camera.main.transform.position - start) / 3;
-                line.SetPositions(new Vector3[] { start, end });
-                yield return new WaitForSeconds(0.2f);
-            }
-        }
-
-        // positive slopes
-        for (int r = 0; r < b.GetHeight() - 3; r++)
-        {
-            for (int c = 0; c < b.GetWidth() - 3; c++)
-            {
-                Vector3 start = BoardToWorldPosition(c, r);
-                Vector3 end = BoardToWorldPosition(c+3, r+3);
-                end += (Camera.main.transform.position - end) / 3;
-                start += (Camera.main.transform.position - start) / 3;
-                line.SetPositions(new Vector3[] { start, end });
-                yield return new WaitForSeconds(0.2f);
-            }
-        }
-
-        // negative slopes
-        for (int r = 0; r < b.GetHeight() - 3; r++)
-        {
-            for (int c = 3; c < b.GetWidth(); c++)
-            {
-                Vector3 start = BoardToWorldPosition(c, r);
-                Vector3 end = BoardToWorldPosition(c-3, r+3);
-                end += (Camera.main.transform.position - end) / 3;
-                start += (Camera.main.transform.position - start) / 3;
-                line.SetPositions(new Vector3[] { start, end });
-                yield return new WaitForSeconds(0.2f);
-            }
-        };
-    }
-
+    
     public void EndTurn()
     {
         suggestUI.SetActive(false);

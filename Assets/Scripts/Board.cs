@@ -39,7 +39,7 @@ public class Board
     // Check if a move is valid (the given column is not full)
     public bool ValidMove(int c)
     {
-        return FirstEmpty(c) != -1;
+        return Get(c, height-1) == SlotType.Empty;
     }
 
     public int GetWidth()
@@ -69,66 +69,7 @@ public class Board
         curState[c, y] = t;
         return y;
     }
-
-    public SlotType[,] GenerateLines()
-    {
-        // how many different lines are in this board (vertical, horizontal, diagonals...)
-        int amount = (width - 3) * height + (height - 3) * width + 2 * (width - 3) * (height - 3);
-
-        SlotType[,] allLines = new SlotType[amount, 4];
-        int counter = 0;
-
-        // horizontal
-        for (int r = 0; r < GetHeight(); r++)
-        {
-            for (int c = 0; c < GetWidth() - 3; c++)
-            {
-                for (int i = 0; i < 4; i++)
-                    allLines[counter, i] = Get(c + i, r);
-
-                counter++;
-            }
-        }
-
-        // vertical
-        for (int r = 0; r < GetHeight() - 3; r++)
-        {
-            for (int c = 0; c < GetWidth(); c++)
-            {
-                for (int i = 0; i < 4; i++)
-                    allLines[counter, i] = Get(c, r + i);
-
-                counter++;
-            }
-        }
-
-        // positive slopes
-        for (int r = 0; r < GetHeight() - 3; r++)
-        {
-            for (int c = 0; c < GetWidth() - 3; c++)
-            {
-                for (int i = 0; i < 4; i++)
-                    allLines[counter, i] = Get(c + i, r + i);
-
-                counter++;
-            }
-        }
-
-        // negative slopes
-        for (int r = 0; r < GetHeight() - 3; r++)
-        {
-            for (int c = 3; c < GetWidth(); c++)
-            {
-                for (int i = 0; i < 4; i++)
-                    allLines[counter, i] = Get(c - i, r + i);
-
-                counter++;
-            }
-        };
-
-        return allLines;
-    }
-
+    
     public bool IsFull()
     {
         for (int i = 0; i < GetWidth(); i++)
@@ -140,10 +81,67 @@ public class Board
     }
 
     // Checks if a win occured in a certain position on the board by a certain player
+    public SlotType WinningMove()
+    {
+        for (int x = 0; x < GetWidth(); x++)
+        {
+            for (int y = 0; y < GetHeight() - 3; y++)
+            {
+                if (curState[x, y] != SlotType.Empty &&
+                    curState[x, y] == curState[x, y + 1] &&
+                    curState[x, y] == curState[x, y + 2] &&
+                    curState[x, y] == curState[x, y + 3])
+                {
+                    return curState[x, y];
+                }
+            }
+        }
+
+        //Check Vertical
+        for (int x = 0; x < GetWidth() - 3; x++)
+        {
+            for (int y = 0; y < GetHeight(); y++)
+            {
+                if (curState[x, y] != SlotType.Empty &&
+                    curState[x, y] == curState[x + 1, y] &&
+                    curState[x, y] == curState[x + 2, y] &&
+                    curState[x, y] == curState[x + 3, y])
+                    return curState[x, y];
+            }
+        }
+
+        //Check Diagonal (top left to bottom right)
+        for (int x = 0; x < GetWidth() - 3; x++)
+        {
+            for (int y = 0; y < GetHeight() - 3; y++)
+            {
+                if (curState[x, y] != SlotType.Empty &&
+                    curState[x, y] == curState[x + 1, y + 1] &&
+                    curState[x, y] == curState[x + 2, y + 2] &&
+                    curState[x, y] == curState[x + 3, y + 3])
+                    return curState[x, y];
+            }
+        }
+
+        //Check Diagonal (top right to bottom left)
+        for (int x = 0; x < GetWidth() - 3; x++)
+        {
+            for (int y = 3; y < GetHeight(); y++)
+            {
+                if (curState[x, y] != SlotType.Empty &&
+                    curState[x, y] == curState[x + 1, y - 1] &&
+                    curState[x, y] == curState[x + 2, y - 2] &&
+                    curState[x, y] == curState[x + 3, y - 3])
+                    return curState[x, y];
+            }
+        }
+
+        return SlotType.Empty;
+    }
+    
     public bool IsWinPos(int c, int r, SlotType t)
     {
         int combo = 0;
-
         // Horizontal
         for (int i = -3; i <= 3; i++)
         {
@@ -151,13 +149,10 @@ public class Board
                 combo++;
             else
                 combo = 0;
-
             if (combo >= 4)
                 return true;
         }
-
         combo = 0;
-
         // Vertical
         for (int i = -3; i <= 3; i++)
         {
@@ -165,13 +160,10 @@ public class Board
                 combo++;
             else
                 combo = 0;
-
             if (combo >= 4)
                 return true;
         }
-
         combo = 0;
-
         // Positive slopes
         for (int i = -3; i <= 3; i++)
         {
@@ -179,13 +171,10 @@ public class Board
                 combo++;
             else
                 combo = 0;
-
             if (combo >= 4)
                 return true;
         }
-
         combo = 0;
-
         // Negative slopes
         for (int i = -3; i <= 3; i++)
         {
@@ -193,11 +182,9 @@ public class Board
                 combo++;
             else
                 combo = 0;
-
             if (combo >= 4)
                 return true;
         }
-
         return false;
     }
 
