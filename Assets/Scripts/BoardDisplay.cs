@@ -8,8 +8,8 @@ using UnityEngine.SceneManagement;
 public class BoardDisplay : MonoBehaviour
 {
     public Vector2Int boardSize = new Vector2Int(0, 0);
-    public float dropSpeed = 1f;
-    public int[] difficultySettings = {1, 3, 5};
+    public float dropAnimSpeed = 1f;
+    public float lineAnimSpeed;
 
     public GameObject gamePiece;
     // For displaying where a piece will be placed
@@ -110,11 +110,11 @@ public class BoardDisplay : MonoBehaviour
         Material mat = t.GetComponent<MeshRenderer>().material;
 
         float startTime = Time.time;
-        float endTime = startTime + dropSpeed;
+        float endTime = startTime + dropAnimSpeed;
 
         while (Time.time <= endTime)
         {
-            var i = (Time.time - startTime) / dropSpeed;
+            var i = (Time.time - startTime) / dropAnimSpeed;
             
             mat.color = new Color(mat.color.r, mat.color.g, mat.color.b, i);
             t.position = Vector3.Lerp(start, end, i);
@@ -152,8 +152,8 @@ public class BoardDisplay : MonoBehaviour
         // Draw a line across the four-in-a-row only if one of the players won
         if (winner != SlotType.Empty)
         {
-            Vector3 start = BoardToWorldPosition(points[0] - 0.1f, points[1] - 0.1f);
-            Vector3 end = BoardToWorldPosition(points[2] - 0.1f, points[3] - 0.1f);
+            Vector3 start = BoardToWorldPosition(points[0], points[1]);
+            Vector3 end = BoardToWorldPosition(points[2], points[3]);
             end += (Camera.main.transform.position - end) / 3;
             start += (Camera.main.transform.position - start) / 3;
 
@@ -191,17 +191,17 @@ public class BoardDisplay : MonoBehaviour
 
     IEnumerator LineAnim(Vector3 start, Vector3 end)
     {
-        float speed = 1;
-        float i = 0;
+        float startTime = Time.time;
+        float endTime = startTime + lineAnimSpeed;
 
-        while (i < 1)
+        while (Time.time < endTime)
         {
-            line.SetPositions(new Vector3[] { start, Vector3.Lerp(start, end, i) });
-
-            i += speed / 100;
-            speed *= 1.001f;
+            float i = Mathf.InverseLerp(startTime, endTime, Time.time);
+            line.SetPositions(new[] { start, Vector3.Lerp(start, end, Mathf.Pow(i, 2)) });
             yield return null;
         }
+        
+        line.SetPositions(new[] { start, end });
     }
 
     // Updates the on-screen status text to show the user what is currently happening.

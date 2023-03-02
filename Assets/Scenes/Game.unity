@@ -2727,7 +2727,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 43
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -2752,13 +2752,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1687258581}
-  m_LocalRotation: {x: 0.060398877, y: -0.70452255, z: 0.060398877, w: 0.70452255}
-  m_LocalPosition: {x: 4.62, y: 0.7, z: 0}
+  m_LocalRotation: {x: 0.032076463, y: -0.7063789, z: 0.032076463, w: 0.7063789}
+  m_LocalPosition: {x: 6.9, y: 0.36, z: -0.11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 9.8, y: -90, z: 0}
+  m_LocalEulerAnglesHint: {x: 5.2, y: -90, z: 0}
 --- !u!114 &1687258586
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2822,8 +2822,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardSize: {x: 7, y: 6}
-  dropSpeed: 0.15
-  difficultySettings: 010000000500000008000000
+  dropAnimSpeed: 0.08
+  lineAnimSpeed: 0.9
   gamePiece: {fileID: 7590623047506475775, guid: f107fc26ad1855947a12b26bf3b53e5c, type: 3}
   line: {fileID: 272026308}
   winScreen: {fileID: 24311400}

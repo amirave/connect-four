@@ -99,7 +99,7 @@ public class Game
     // Small wait before starting next turn, to give time to the drop animation to finish
     private IEnumerator WaitForStartTurn()
     {
-        yield return new WaitForSeconds(display.dropSpeed * 1.1f);
+        yield return new WaitForSeconds(display.dropAnimSpeed * 1.1f);
         StartTurn();
     }
 
