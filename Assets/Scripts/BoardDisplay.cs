@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using LlamAcademy.Spring.Runtime;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -57,7 +60,7 @@ public class BoardDisplay : MonoBehaviour
     // Called by Unity when "Suggest a move" button is pressed in game
     public void OnSuggest()
     {
-        int c = AI.Minimax(game.GetBoard(), game.curPlayer.slotType, 3, int.MinValue, int.MaxValue, true).GetFirst();
+        int c = Algorithms.Minimax(game.GetBoard(), game.curPlayer.slotType, 3, int.MinValue, int.MaxValue, true).GetFirst();
         int r = game.GetBoard().FirstEmpty(c);
 
         Vector3 pos = BoardToWorldPosition(c, r);
@@ -91,39 +94,23 @@ public class BoardDisplay : MonoBehaviour
 
     public void DropPiece(SlotType t, int x, int y)
     {
+        Vector3 startPos = BoardToWorldPosition(x, game.GetBoard().GetHeight() + 1);
         Vector3 pos = BoardToWorldPosition(x, y);
 
-        GameObject piece = Instantiate(gamePiece, pos, Quaternion.Euler(0, 0, 90));
+        GameObject piece = Instantiate(gamePiece, startPos, Quaternion.Euler(0, 90, 0));
         piece.transform.parent = transform;
 
         Color c = t == SlotType.One ? playerOneColor : playerTwoColor;
         piece.GetComponent<MeshRenderer>().material.color = new Color(c.r, c.g, c.b, 0.2f);
-        StartCoroutine(DropAnim(piece.transform, x, y));
-    }
 
-    // Drops a piece in place
-    public IEnumerator DropAnim(Transform t, int x, int y)
-    {
-        Vector3 start = BoardToWorldPosition(x, y + 1.5f);
-        Vector3 end = BoardToWorldPosition(x, y);
-
-        Material mat = t.GetComponent<MeshRenderer>().material;
-
-        float startTime = Time.time;
-        float endTime = startTime + dropAnimSpeed;
-
-        while (Time.time <= endTime)
+        Material mat = piece.GetComponent<MeshRenderer>().material;
+        
+        SpringToTarget3D spring = piece.GetComponent<SpringToTarget3D>();
+        spring.SpringTo(pos, () =>
         {
-            var i = (Time.time - startTime) / dropAnimSpeed;
-            
-            mat.color = new Color(mat.color.r, mat.color.g, mat.color.b, i);
-            t.position = Vector3.Lerp(start, end, i);
-            
-            yield return null;
-        }
-
-        t.position = end;
-        mat.color = new Color(mat.color.r, mat.color.g, mat.color.b, 1);
+            piece.transform.position = pos;
+            mat.color = new Color(c.r, c.g, c.b, 1); 
+        });
     }
 
     // Destroys all game pieces and places new ones
@@ -152,8 +139,8 @@ public class BoardDisplay : MonoBehaviour
         // Draw a line across the four-in-a-row only if one of the players won
         if (winner != SlotType.Empty)
         {
-            Vector3 start = BoardToWorldPosition(points[0], points[1]);
-            Vector3 end = BoardToWorldPosition(points[2], points[3]);
+            Vector3 start = BoardToWorldPosition(points[0], points[1] - 0.05f);
+            Vector3 end = BoardToWorldPosition(points[2], points[3] - 0.05f);
             end += (Camera.main.transform.position - end) / 3;
             start += (Camera.main.transform.position - start) / 3;
 
@@ -209,7 +196,7 @@ public class BoardDisplay : MonoBehaviour
     public void UpdateTurnStatus(string newText, bool firstsTurn)
     {
         turnStatusText.text = newText;
-        turnStatusText.color = firstsTurn ? playerOneColor : playerTwoColor;
+        turnStatusText.color = (1.5f * (firstsTurn ? playerOneColor : playerTwoColor)).SetAlpha(1);
     }
 
     // Converts a position on the board to a 3D position in the world

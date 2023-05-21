@@ -21,7 +21,7 @@ public class HumanPlayer : Player
     {
         this.display = display;
         
-        GameObject piece = GameObject.Instantiate(gamePiece);
+        GameObject piece = Object.Instantiate(gamePiece, Vector3.zero, Quaternion.Euler(0, 90, 0));
         
         Color c = slotType == SlotType.One ? display.playerOneColor : display.playerTwoColor;
         piece.GetComponent<MeshRenderer>().material.color = new Color(c.r, c.g, c.b, 0.2f);

@@ -17,24 +17,22 @@ public class MenuManager : MonoBehaviour
     {
         playerOneType.onValueChanged.AddListener((i) => playerOneDifficulty.gameObject.SetActive((PlayerType) i == PlayerType.AI));
         playerTwoType.onValueChanged.AddListener((i) => playerTwoDifficulty.gameObject.SetActive((PlayerType) i == PlayerType.AI));
+        
+        // Set to previous values
+        playerOneType.value = Game.playerOneType;
+        playerTwoType.value = Game.playerTwoType;
+        playerOneDifficulty.value = Game.playerOneDifficulty;
+        playerTwoDifficulty.value = Game.playerTwoDifficulty;
     }
 
-    private void Update()
+    public void OnStart()
     {
         Game.playerOneType = playerOneType.value;
         Game.playerTwoType = playerTwoType.value;
         
         Game.playerOneDifficulty = playerOneDifficulty.value;
         Game.playerTwoDifficulty = playerTwoDifficulty.value;
-    }
-
-    public void OnStart()
-    {
+        
         SceneManager.LoadScene(1);
-    }
-
-    public void OnReturn()
-    {
-        SceneManager.LoadScene(0);
     }
 }
