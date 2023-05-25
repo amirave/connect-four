@@ -22,7 +22,7 @@ public class Game
     private Player playerTwo;
 
     private BoardDisplay display;
-    // Difficulty to depth - Easy: 1, Medium: 5, Hard: 8
+    // Difficulty to depth - Easy: 2, Medium: 5, Hard: 7
     private int[] difficultySettings = { 2, 5, 7 };
     
     public bool firstsTurn => turnCount % 2 == 0;

@@ -17,13 +17,14 @@ public static class Algorithms
         if (state.IsFull())
             return new Pair<int, int>(-1, 0);
 
+        SlotType winningMove = state.WinningMove();
+        if (winningMove == type)
+            return new Pair<int, int>(-1, 1000000);
+        if (winningMove == otherType)
+            return new Pair<int, int>(-1, -1000000);
+
         if (depth == 0)
             return new Pair<int, int>(-1, EvaluateBoard(state, type));
-        
-        if (state.WinningMove() == type)
-            return new Pair<int, int>(-1, 1000000);
-        if (state.WinningMove() == otherType)
-            return new Pair<int, int>(-1, -1000000);
 
         // If its the player's turn, try to maximize score, if its the opponent's turn, try to minimize score
         if (myTurn)
@@ -148,17 +149,13 @@ public static class Algorithms
         SlotType otherType = type == SlotType.One ? SlotType.Two : SlotType.One;
 
         int score = 0;
-
-        if (CountLine(line, type) == 4)
-            score += 100;
-        else if (CountLine(line, type) == 3 && CountLine(line, SlotType.Empty) == 1)
+        
+        if (CountLine(line, type) == 3 && CountLine(line, SlotType.Empty) == 1)
             score += 20;
         else if (CountLine(line, type) == 2 && CountLine(line, SlotType.Empty) == 2)
             score += 2;
-
-        if (CountLine(line, otherType) == 4)
-            score -= 100;
-        else if (CountLine(line, otherType) == 3 && CountLine(line, SlotType.Empty) == 1)
+        
+        if (CountLine(line, otherType) == 3 && CountLine(line, SlotType.Empty) == 1)
             score -= 20;
         else if (CountLine(line, otherType) == 2 && CountLine(line, SlotType.Empty) == 2)
             score -= 2;
