@@ -8,23 +8,23 @@ public static class Algorithms
     // Standard minimax algorithm with alpha-beta pruning.
     // Returns a pair of the best move (used in game) and its corresponding score (used in recursive calls of the algorithm)
     // Called by the AI player
-    public static Pair<int, int> Minimax(Board state, SlotType type, int depth, int alpha, int beta, bool myTurn)
+    public static (int, int) Minimax(Board state, SlotType type, int depth, int alpha, int beta, bool myTurn)
     {
         // Each step of the recursion the turn swaps
         SlotType otherType = type == SlotType.One ? SlotType.Two : SlotType.One;
 
         // A board that is full has no valid moves (-1) and a score of zero
         if (state.IsFull())
-            return new Pair<int, int>(-1, 0);
+            return (-1, 0);
 
         SlotType winningMove = state.WinningMove();
         if (winningMove == type)
-            return new Pair<int, int>(-1, 1000000);
+            return (-1, 1000000);
         if (winningMove == otherType)
-            return new Pair<int, int>(-1, -1000000);
+            return (-1, -1000000);
 
         if (depth == 0)
-            return new Pair<int, int>(-1, EvaluateBoard(state, type));
+            return (-1, EvaluateBoard(state, type));
 
         // If its the player's turn, try to maximize score, if its the opponent's turn, try to minimize score
         if (myTurn)
@@ -41,7 +41,7 @@ public static class Algorithms
                 // Clone the board to not affect the old one
                 Board next = new Board(state);
                 int r = next.Set(c, type);
-                int nextScore = Minimax(next, type, depth - 1, alpha, beta, false).GetSecond();
+                int nextScore = Minimax(next, type, depth - 1, alpha, beta, false).Item2;
 
                 if (nextScore > bestValue)
                 {
@@ -54,7 +54,7 @@ public static class Algorithms
                     break;
             }
 
-            return new Pair<int, int>(bestC, bestValue);
+            return (bestC, bestValue);
         }
         else
         {
@@ -70,7 +70,7 @@ public static class Algorithms
                 // Clone the board to not affect the old one
                 Board next = new Board(state);
                 int r = next.Set(c, otherType);
-                int nextScore = Minimax(next, type, depth - 1, alpha, beta, true).GetSecond();
+                int nextScore = Minimax(next, type, depth - 1, alpha, beta, true).Item2;
 
                 if (nextScore < worseValue)
                 {
@@ -83,7 +83,7 @@ public static class Algorithms
                     break;
             }
 
-            return new Pair<int, int>(worstC, worseValue);
+            return (worstC, worseValue);
         }
     }
 

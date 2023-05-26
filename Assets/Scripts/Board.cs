@@ -52,11 +52,6 @@ public class Board
         return curState.GetLength(1);
     }
 
-    public bool InBounds(int c, int r)
-    {
-        return (c < GetWidth() && r < GetHeight() && c >= 0 && r >= 0);
-    }
-
     public SlotType Get(int x, int y)
     {
         return curState[x, y];
@@ -136,55 +131,6 @@ public class Board
         }
 
         return SlotType.Empty;
-    }
-    
-    public bool IsWinPos(int c, int r, SlotType t)
-    {
-        int combo = 0;
-        // Horizontal
-        for (int i = -3; i <= 3; i++)
-        {
-            if (InBounds(c + i, r) && Get(c + i, r) == t || i == 0)
-                combo++;
-            else
-                combo = 0;
-            if (combo >= 4)
-                return true;
-        }
-        combo = 0;
-        // Vertical
-        for (int i = -3; i <= 3; i++)
-        {
-            if (InBounds(c, r + i) && Get(c, r + i) == t || i == 0)
-                combo++;
-            else
-                combo = 0;
-            if (combo >= 4)
-                return true;
-        }
-        combo = 0;
-        // Positive slopes
-        for (int i = -3; i <= 3; i++)
-        {
-            if (InBounds(c + i, r + i) && Get(c + i, r + i) == t || i == 0)
-                combo++;
-            else
-                combo = 0;
-            if (combo >= 4)
-                return true;
-        }
-        combo = 0;
-        // Negative slopes
-        for (int i = -3; i <= 3; i++)
-        {
-            if (InBounds(c - i, r + i) && Get(c - i, r + i) == t || i == 0)
-                combo++;
-            else
-                combo = 0;
-            if (combo >= 4)
-                return true;
-        }
-        return false;
     }
 
     // If the game is won, returns the positions of the four-in-a-row

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using LlamAcademy.Spring.Runtime;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -11,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class BoardDisplay : MonoBehaviour
 {
     public Vector2Int boardSize = new Vector2Int(0, 0);
-    public float dropAnimSpeed = 1f;
+    public float dropAnimDuration = 1f;
     public float lineAnimSpeed;
 
     public GameObject gamePiece;
@@ -60,7 +59,7 @@ public class BoardDisplay : MonoBehaviour
     // Called by Unity when "Suggest a move" button is pressed in game
     public void OnSuggest()
     {
-        int c = Algorithms.Minimax(game.GetBoard(), game.curPlayer.slotType, 3, int.MinValue, int.MaxValue, true).GetFirst();
+        int c = Algorithms.Minimax(game.GetBoard(), game.curPlayer.slotType, 3, int.MinValue, int.MaxValue, true).Item1;
         int r = game.GetBoard().FirstEmpty(c);
 
         Vector3 pos = BoardToWorldPosition(c, r);
@@ -92,25 +91,35 @@ public class BoardDisplay : MonoBehaviour
         ResetBoardDisplay();
     }
 
-    public void DropPiece(SlotType t, int x, int y)
+    public IEnumerator DropPiece(SlotType type, int x, int y)
     {
         Vector3 startPos = BoardToWorldPosition(x, game.GetBoard().GetHeight() + 1);
-        Vector3 pos = BoardToWorldPosition(x, y);
+        Vector3 endPos = BoardToWorldPosition(x, y);
 
         GameObject piece = Instantiate(gamePiece, startPos, Quaternion.Euler(0, 90, 0));
         piece.transform.parent = transform;
 
-        Color c = t == SlotType.One ? playerOneColor : playerTwoColor;
+        Color c = type == SlotType.One ? playerOneColor : playerTwoColor;
         piece.GetComponent<MeshRenderer>().material.color = new Color(c.r, c.g, c.b, 0.2f);
 
         Material mat = piece.GetComponent<MeshRenderer>().material;
+        Transform t = piece.transform;
         
-        SpringToTarget3D spring = piece.GetComponent<SpringToTarget3D>();
-        spring.SpringTo(pos, () =>
+        float startTime = Time.time;
+        float endTime = startTime + dropAnimDuration;
+
+        while (Time.time <= endTime)
         {
-            piece.transform.position = pos;
-            mat.color = new Color(c.r, c.g, c.b, 1); 
-        });
+            var i = (Time.time - startTime) / dropAnimDuration;
+            
+            mat.color = new Color(mat.color.r, mat.color.g, mat.color.b, i);
+            piece.transform.position = Vector3.Lerp(startPos, endPos, Mathf.Pow(i, 0.1f));
+            
+            yield return null;
+        }
+
+        piece.transform.position = endPos;
+        mat.color = new Color(mat.color.r, mat.color.g, mat.color.b, 1);
     }
 
     // Destroys all game pieces and places new ones
@@ -125,16 +134,11 @@ public class BoardDisplay : MonoBehaviour
         for (int x = 0; x < b.GetWidth(); x++)
             for (int y = 0; y < b.GetHeight(); y++)
                 if (b.Get(x, y) != SlotType.Empty)
-                    DropPiece(b.Get(x, y), x, y);
-    }
-
-    public void Win(int[] points, SlotType winner)
-    {
-        StartCoroutine(WinAnim(points, winner));
+                    StartCoroutine(DropPiece(b.Get(x, y), x, y));
     }
 
     // Draws the line where the win happened and animates the victory screen
-    IEnumerator WinAnim(int[] points, SlotType winner)
+    public IEnumerator GameOverAnim(int[] points, SlotType winner)
     {
         // Draw a line across the four-in-a-row only if one of the players won
         if (winner != SlotType.Empty)

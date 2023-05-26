@@ -51,7 +51,7 @@ public class HumanPlayer : Player
         if (r != -1)
         {
             Vector3 hoverTarget = display.BoardToWorldPosition(c, r);
-            hoverPiece.position = Vector3.Lerp(hoverPiece.position, hoverTarget, 1 * Time.deltaTime * 30);
+            hoverPiece.position = Vector3.Lerp(hoverPiece.position, hoverTarget, Time.deltaTime * 30);
         }
 
         // When user clicks, check if move is valid and if so set it

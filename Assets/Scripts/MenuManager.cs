@@ -29,7 +29,6 @@ public class MenuManager : MonoBehaviour
     {
         Game.playerOneType = playerOneType.value;
         Game.playerTwoType = playerTwoType.value;
-        
         Game.playerOneDifficulty = playerOneDifficulty.value;
         Game.playerTwoDifficulty = playerTwoDifficulty.value;
         

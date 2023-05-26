@@ -32,7 +32,7 @@ public class AIPlayer : Player
             callback(Random.Range(0, game.GetBoard().GetWidth()));
         else
         {
-            int column = Algorithms.Minimax(game.GetBoard(), slotType, depth, int.MinValue, int.MaxValue, true).GetFirst();
+            int column = Algorithms.Minimax(game.GetBoard(), slotType, depth, int.MinValue, int.MaxValue, true).Item1;
             callback(column);
         }
     }

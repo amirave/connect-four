@@ -3007,7 +3007,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardSize: {x: 7, y: 6}
-  dropAnimSpeed: 0.08
+  dropAnimDuration: 0.2
   lineAnimSpeed: 0.9
   gamePiece: {fileID: 2953419405654740403, guid: 84b825fd2b258f8478fe3138b49446da, type: 3}
   line: {fileID: 272026308}

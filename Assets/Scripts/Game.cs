@@ -78,7 +78,7 @@ public class Game
         if (board.IsFull())
         {
             gameEnded = true;
-            display.Win(null, SlotType.Empty);
+            display.StartCoroutine(display.GameOverAnim(null, SlotType.Empty));
             return;
         }
         
@@ -88,7 +88,7 @@ public class Game
         if (winData != null)
         {
             gameEnded = true;
-            display.Win(winData, curType);
+            display.StartCoroutine(display.GameOverAnim(winData, curType));
             return;
         }
 
@@ -99,14 +99,14 @@ public class Game
     // Small wait before starting next turn, to give time to the drop animation to finish
     private IEnumerator WaitForStartTurn()
     {
-        yield return new WaitForSeconds(display.dropAnimSpeed * 1.1f);
+        yield return new WaitForSeconds(display.dropAnimDuration * 1.1f);
         StartTurn();
     }
 
     private void Set(int c, SlotType t)
     {
         int y = board.Set(c, t);
-        display.DropPiece(t, c, y);
+        display.StartCoroutine(display.DropPiece(t, c, y));
     }
 
     // Takes a savable board that was serialized and converts it into a board object
@@ -150,28 +150,6 @@ public class Game
     public int GetTurnCount()
     {
         return turnCount;
-    }
-}
-
-public struct Pair<T, V>
-{
-    private T t;
-    private V v;
-
-    public Pair(T t, V v)
-    {
-        this.t = t;
-        this.v = v;
-    }
-
-    public T GetFirst()
-    {
-        return t;
-    }
-
-    public V GetSecond()
-    {
-        return v;
     }
 }
 
