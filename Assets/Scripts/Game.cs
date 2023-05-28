@@ -74,26 +74,25 @@ public class Game
         midTurn = false;
         turnCount++;
 
-        // Win state is draw
-        if (board.IsFull())
-        {
-            gameEnded = true;
-            display.StartCoroutine(display.GameOverAnim(null, SlotType.Empty));
-            return;
-        }
+        int[] winData = board.WinData(curType);
         
         // Check win state
-        int[] winData = board.WinData(curType);
-
         if (winData != null)
         {
             gameEnded = true;
             display.StartCoroutine(display.GameOverAnim(winData, curType));
-            return;
         }
-
-        if (gameEnded == false)
+        // Win state is draw
+        else if (board.IsFull())
+        {
+            gameEnded = true;
+            display.StartCoroutine(display.GameOverAnim(null, SlotType.Empty));
+        }
+        // No win state - game didn't end yet
+        else
+        {
             display.StartCoroutine(WaitForStartTurn());
+        }
     }
 
     // Small wait before starting next turn, to give time to the drop animation to finish
